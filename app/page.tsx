@@ -76,6 +76,26 @@ export default function Home() {
     if (data) setActivities((prev) => [...prev, data]);
   }
 
+  async function updateActivity(id: string, payload: Partial<Activity>) {
+    if (!unlocked) {
+      setShowGate(true);
+      return;
+    }
+    // optimistic update
+    setActivities((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, ...payload } : a))
+    );
+    const { error } = await supabase
+      .from("activities")
+      .update(payload)
+      .eq("id", id);
+    if (error) {
+      console.error(error);
+      // refetch on error to recover the true state
+      void fetchActivities();
+    }
+  }
+
   const days = activities.reduce<Record<number, Activity[]>>((acc, a) => {
     (acc[a.day_number] ||= []).push(a);
     return acc;
@@ -98,7 +118,7 @@ export default function Home() {
               12 – 21 June 2026 · 10 days
             </p>
             <h1 className="text-3xl sm:text-4xl font-bold mt-1">
-              Malaysia Honeymoon
+              Malaysia- 2026
             </h1>
             <p className="text-sm text-ink/60 mt-1">
               KL · Genting · Perhentian Islands
@@ -150,6 +170,7 @@ export default function Home() {
             onToggle={toggleDone}
             onDelete={deleteActivity}
             onAdd={addActivity}
+            onUpdate={updateActivity}
           />
         ))}
       </div>
