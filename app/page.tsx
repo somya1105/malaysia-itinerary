@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase, isConfigured, type Activity } from "@/lib/supabase";
-import { useEditLock } from "@/lib/auth";
+import { supabase, type Activity } from "@/lib/supabase";
 import DayCard from "@/components/DayCard";
-import PasscodeGate from "@/components/PasscodeGate";
 
 // Skip static prerendering — this page is fully client-side
 // and depends on Supabase env vars only available at runtime.
@@ -13,8 +11,6 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showGate, setShowGate] = useState(false);
-  const { unlocked, hydrated, unlock, lock } = useEditLock();
 
   useEffect(() => {
     void fetchActivities();
@@ -32,18 +28,7 @@ export default function Home() {
     setLoading(false);
   }
 
-  function requireUnlock(fn: () => void) {
-    return () => {
-      if (unlocked) fn();
-      else setShowGate(true);
-    };
-  }
-
   async function toggleDone(id: string, current: boolean) {
-    if (!unlocked) {
-      setShowGate(true);
-      return;
-    }
     setActivities((prev) =>
       prev.map((a) => (a.id === id ? { ...a, done: !current } : a))
     );
@@ -51,19 +36,11 @@ export default function Home() {
   }
 
   async function deleteActivity(id: string) {
-    if (!unlocked) {
-      setShowGate(true);
-      return;
-    }
     setActivities((prev) => prev.filter((a) => a.id !== id));
     await supabase.from("activities").delete().eq("id", id);
   }
 
   async function addActivity(payload: Partial<Activity>) {
-    if (!unlocked) {
-      setShowGate(true);
-      return;
-    }
     const { data, error } = await supabase
       .from("activities")
       .insert([payload])
@@ -77,10 +54,6 @@ export default function Home() {
   }
 
   async function updateActivity(id: string, payload: Partial<Activity>) {
-    if (!unlocked) {
-      setShowGate(true);
-      return;
-    }
     // optimistic update
     setActivities((prev) =>
       prev.map((a) => (a.id === id ? { ...a, ...payload } : a))
@@ -91,7 +64,6 @@ export default function Home() {
       .eq("id", id);
     if (error) {
       console.error(error);
-      // refetch on error to recover the true state
       void fetchActivities();
     }
   }
@@ -112,28 +84,13 @@ export default function Home() {
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
       <header className="mb-8">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-ocean font-semibold">
-              12 – 21 June 2026 · 10 days
-            </p>
-            <h1 className="text-3xl sm:text-4xl font-bold mt-1">
-              Malaysia- 2026
-            </h1>
-            <p className="text-sm text-ink/60 mt-1">
-              KL · Genting · Perhentian Islands
-            </p>
-          </div>
-          {hydrated && (
-            <button
-              onClick={() => (unlocked ? lock() : setShowGate(true))}
-              className="text-xs px-3 py-1.5 rounded-full border border-ink/15 hover:border-ocean hover:text-ocean transition-colors flex-shrink-0"
-              title={unlocked ? "Click to lock" : "Click to unlock editing"}
-            >
-              {unlocked ? "🔓 Unlocked" : "🔒 View-only"}
-            </button>
-          )}
-        </div>
+        <p className="text-xs uppercase tracking-widest text-ocean font-semibold">
+          12 – 21 June 2026 · 10 days
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-bold mt-1">Malaysia- 2026</h1>
+        <p className="text-sm text-ink/60 mt-1">
+          KL · Genting · Perhentian Islands
+        </p>
         <div className="mt-4 flex items-center gap-3">
           <div className="flex-1 h-2 bg-ink/10 rounded-full overflow-hidden">
             <div
@@ -166,7 +123,7 @@ export default function Home() {
             key={dayNum}
             dayNumber={dayNum}
             activities={days[dayNum]}
-            unlocked={unlocked}
+            unlocked={true}
             onToggle={toggleDone}
             onDelete={deleteActivity}
             onAdd={addActivity}
@@ -178,17 +135,6 @@ export default function Home() {
       <footer className="mt-12 pt-6 border-t border-ink/10 text-xs text-ink/40 text-center">
         Built with Next.js + Supabase · Hosted on Vercel
       </footer>
-
-      {showGate && (
-        <PasscodeGate
-          onUnlock={(code) => {
-            const ok = unlock(code);
-            if (ok) setShowGate(false);
-            return ok;
-          }}
-          onCancel={() => setShowGate(false)}
-        />
-      )}
     </main>
   );
 }
