@@ -28,15 +28,15 @@ A day-by-day itinerary site with checkboxes, inline add/remove. Next.js 14 + Sup
 
 ### 3. Get your keys
 
-In Supabase: **Project Settings → API**
-- `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-- `anon public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+✅ **Already done.** The `.env.local` file in this repo has Somya's values pre-populated:
+- `NEXT_PUBLIC_SUPABASE_URL=https://thgmxwfmmcyzyxhgssax.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY=...` (anon key, safe for client-side)
+
+If you ever regenerate the anon key in Supabase (Project Settings → API → Rotate), update `.env.local` AND the Vercel env vars.
 
 ### 4. Run locally (optional)
 
 ```bash
-cp .env.local.example .env.local
-# edit .env.local with your Supabase URL + anon key
 npm install
 npm run dev
 ```
@@ -52,11 +52,28 @@ vercel
 
 Or push to GitHub and use the Vercel dashboard import flow.
 
-**Important:** In Vercel project settings → Environment Variables, add:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+**Important:** In Vercel project settings → Environment Variables, add THREE values from `.env.local`:
 
-Then redeploy.
+```
+NEXT_PUBLIC_SUPABASE_URL=https://thgmxwfmmcyzyxhgssax.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZ214d2ZtbWN5enl4aGdzc2F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMDc2NzUsImV4cCI6MjA5NTg4MzY3NX0.bnJqK6YskNxNj8Mvy4jOSraZ9O86e8qZ-vK01Kqcfo4
+NEXT_PUBLIC_EDIT_PASSCODE=malaysia2026
+```
+
+Apply to Production, Preview, and Development. Then redeploy.
+
+## Passcode gate
+
+The site is **read-open, write-gated**. Anyone with the URL can SEE the itinerary, but check/add/delete requires entering the passcode.
+
+- Current passcode: `malaysia2026` (from `.env.local`)
+- Click the "🔒 View-only" pill in the top-right of the site to unlock.
+- Unlocked state is stored per-device via `localStorage` — enter once, never re-enter on that browser.
+- Click "🔓 Unlocked" to re-lock if you hand someone the URL temporarily.
+
+**Change the passcode:** edit `NEXT_PUBLIC_EDIT_PASSCODE` in `.env.local` (for local) AND in Vercel's env vars (for production), then redeploy.
+
+**Security honest-talk:** the passcode is `NEXT_PUBLIC_*` so it ends up in the JavaScript bundle. Someone who downloads the JS and reads it can find the code. This is "good-enough security" to stop drive-by editors, not nation-state attackers. For real auth, add Supabase Auth (see TODO at bottom of README).
 
 ## File structure
 
