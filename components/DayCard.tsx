@@ -8,6 +8,7 @@ import AddActivityForm from "./AddActivityForm";
 type Props = {
   dayNumber: number;
   activities: Activity[];
+  unlocked: boolean;
   onToggle: (id: string, current: boolean) => void;
   onDelete: (id: string) => void;
   onAdd: (payload: Partial<Activity>) => void;
@@ -16,6 +17,7 @@ type Props = {
 export default function DayCard({
   dayNumber,
   activities,
+  unlocked,
   onToggle,
   onDelete,
   onAdd,
@@ -61,6 +63,7 @@ export default function DayCard({
               <ActivityItem
                 key={a.id}
                 activity={a}
+                unlocked={unlocked}
                 onToggle={onToggle}
                 onDelete={onDelete}
               />

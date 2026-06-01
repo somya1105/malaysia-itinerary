@@ -16,11 +16,17 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 type Props = {
   activity: Activity;
+  unlocked: boolean;
   onToggle: (id: string, current: boolean) => void;
   onDelete: (id: string) => void;
 };
 
-export default function ActivityItem({ activity, onToggle, onDelete }: Props) {
+export default function ActivityItem({
+  activity,
+  unlocked,
+  onToggle,
+  onDelete,
+}: Props) {
   const emoji =
     (activity.category && CATEGORY_EMOJI[activity.category]) || "📍";
 
@@ -72,15 +78,17 @@ export default function ActivityItem({ activity, onToggle, onDelete }: Props) {
         )}
       </div>
 
-      <button
-        onClick={() => {
-          if (confirm(`Remove "${activity.title}"?`)) onDelete(activity.id);
-        }}
-        className="opacity-0 group-hover:opacity-100 transition-opacity text-ink/30 hover:text-sunset px-2 py-1 text-sm"
-        aria-label="Delete"
-      >
-        ✕
-      </button>
+      {unlocked && (
+        <button
+          onClick={() => {
+            if (confirm(`Remove "${activity.title}"?`)) onDelete(activity.id);
+          }}
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-ink/30 hover:text-sunset px-2 py-1 text-sm"
+          aria-label="Delete"
+        >
+          ✕
+        </button>
+      )}
     </li>
   );
 }
