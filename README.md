@@ -1,4 +1,4 @@
-# Malaysia Honeymoon Itinerary
+# Malaysia Itinerary
 
 A day-by-day itinerary site with checkboxes, inline add/remove. Next.js 14 + Supabase, deployable to Vercel.
 
