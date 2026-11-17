@@ -55,10 +55,7 @@ Or push to GitHub and use the Vercel dashboard import flow.
 **Important:** In Vercel project settings → Environment Variables, add THREE values from `.env.local`:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://thgmxwfmmcyzyxhgssax.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZ214d2ZtbWN5enl4aGdzc2F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMDc2NzUsImV4cCI6MjA5NTg4MzY3NX0.bnJqK6YskNxNj8Mvy4jOSraZ9O86e8qZ-vK01Kqcfo4
-NEXT_PUBLIC_EDIT_PASSCODE=malaysia2026
-```
+
 
 Apply to Production, Preview, and Development. Then redeploy.
 
